@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YOLOv8 Object Detection</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+        }
+
+        #uploadContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 300px;
+            height: 300px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        #uploadButton {
+            width: 200px;
+            height: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #uploadButton:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        #result.show {
+            opacity: 1;
+        }
+
+        #result.detection-present {
+            background-color: #4CAF50;
+        }
+
+        #result.no-detection {
+            background-color: #f44336;
+        }
+
+        #uploadedImage {
+            display: none;
+            max-width: 400px;
+            max-height: 400px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <img id="uploadedImage" src="#" alt="Uploaded Image">
+    <div id="result"></div>
+    <div id="uploadContainer">
+        <label for="uploadInput">
+            <button id="uploadButton">Choose File</button>
+        </label>
+        <input id="uploadInput" type="file" accept="image/*" style="display: none;">
+    </div>
+    <script>
+        /**
+         * "Upload" button onClick handler: uploads selected
+         * image file to the backend, receives the detection result,
+         * and displays the result message.
+         */
+        const input = document.getElementById("uploadInput");
+        const uploadButton = document.getElementById("uploadButton");
+        const uploadContainer = document.getElementById("uploadContainer");
+        const resultDiv = document.getElementById("result");
+        const uploadedImage = document.getElementById("uploadedImage");
+
+        uploadButton.addEventListener("click", () => {
+            input.click();
+        });
+
+        input.addEventListener("change", async (event) => {
+            const file = event.target.files[0];
+            const data = new FormData();
+            data.append("image_file", file, "image_file");
+            const response = await fetch("/detect", {
+                method: "POST",
+                body: data
+            });
+            const result = await response.json();
+            displayDetectionResult(result);
+
+            uploadedImage.src = URL.createObjectURL(file);
+            uploadedImage.style.display = "block";
+            uploadContainer.style.marginTop = "0px";
+        });
+
+        /**
+         * Function displays the detection result with a pop-up effect.
+         * @param result Detection result JSON object
+         */
+        function displayDetectionResult(result) {
+            if (result.detection_present) {
+                resultDiv.textContent = "Detection Present";
+                resultDiv.className = "show detection-present";
+            } else {
+                resultDiv.textContent = "No Detection";
+                resultDiv.className = "show no-detection";
+            }
+        }
+    </script>
+</body>
+</html>
+
