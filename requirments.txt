@@ -1,0 +1,7 @@
+Flask
+torch
+opencv-python
+tensorflow
+matplotlib
+Pillow
+waitress
