@@ -6,7 +6,7 @@ This is a web application built using Flask and YOLOv8 object detection to perfo
 
 ## Prerequisites
 
-- Python 3.6 or higher
+- Python 3.6 or higher version 
 
 ## Installation
 
